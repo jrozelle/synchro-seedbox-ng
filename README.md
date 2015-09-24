@@ -12,3 +12,16 @@ cd synchro-seedbox
 chmod +x makeinstall.sh
 
 ./makeinstall.sh
+
+
+Configuration :
+================
+
+Configuration file is /usr/local/etc/synchro-seedbox-ng/synchro.conf
+
+Usage :
+========
+
+Execute SSNG command
+
+# ssng /my/seedbox/folder /my/nas/folder 
