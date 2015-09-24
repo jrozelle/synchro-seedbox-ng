@@ -2,21 +2,22 @@
 
 function USAGE
 {
-	echo "Usage: synchro.sh {start|stop} source-path" >&2
+	echo "Usage: ssng {start|stop} src-path dst-path" >&2
 }
 
-if [ "$#" -ne "2" ]; then
+if [ "$#" -ne "3" ]; then
     USAGE
     exit 1
 fi
 
 SPOOL_BASE="/var/spool/synchro-seedbox-ng"
-SOURCE_PATH=$2
+SRC_PATH=$2
+DST_PATH=$3
 SYNC_ID=`echo -n $2 | md5sum | cut -d' ' -f 1`
-SYNC_SPOOL_SOURCE_PATH="$SPOOL_BASE/$SYNC_ID"
-SYNC_FILELIST="$SYNC_SPOOL_SOURCE_PATH/file_list.log"
-SYNC_LOG="$SYNC_SPOOL_SOURCE_PATH/sending.log"
-LOCK_FILE="$SYNC_SPOOL_SOURCE_PATH/lock"
+SYNC_SPOOL_SRC_PATH="$SPOOL_BASE/$SYNC_ID"
+SYNC_FILELIST="$SYNC_SPOOL_SRC_PATH/file_list.log"
+SYNC_LOG="$SYNC_SPOOL_SRC_PATH/sending.log"
+LOCK_FILE="$SYNC_SPOOL_SRC_PATH/lock"
 
 function browse_dir
 {
@@ -27,11 +28,11 @@ local i
 
 if test $# -lt 1
 then
-dir=$SOURCE_PATH
+dir=$SRC_PATH
 rel=""
 else
 rel="$1/"
-dir="$SOURCE_PATH$rel"
+dir="$SRC_PATH$rel"
 fi
 
 echo "scanning $dir"
@@ -42,11 +43,11 @@ do
 	then
 
 		age=`stat -c %Y "$i"`
-		echo "$age:${i//"$SOURCE_PATH/"/}" >> $SYNC_FILELIST
+		echo "$age:${i//"$SRC_PATH/"/}" >> $SYNC_FILELIST
 	else
 	if test -d "$i"
 	then
-		browse_dir "${i//"$SOURCE_PATH"/}"
+		browse_dir "${i//"$SRC_PATH"/}"
 	fi
 	fi
 done
@@ -73,7 +74,7 @@ do
 	IFS=$old_IFS
 	line1=${line##$patern}
 #	echo $line1
-	fic=${line1##"$SOURCE_PATH"}
+	fic=${line1##"$SRC_PATH"}
 #	echo $fic
 	rel="${fic%$patern2}/"
 #	echo $rel
@@ -85,24 +86,24 @@ IFS=$old_IFS
 
 function send_file_job
 {
-	echo "sending $1"
-	echo "$SOURCE_PATH/$1" > $SYNC_LOG
-
-	rsync -aPRL --partial-dir=.tmp --temp-dir=.tmp --rsh=ssh --remove-sent-files --bwlimit=$bwlimit "$1" "$user_SSH"@"$IP":"$SYNC_DEST" >> $SYNC_LOG
+	echo "sending $SRC_PATH/$1"
+	echo "$SRC_PATH/$1" > $SYNC_LOG
+	
+        rsync -aPRL --partial-dir='.tmp' --temp-dir='.tmp' --rsh=ssh --remove-sent-files --bwlimit=$bwlimit "$1" "$user_SSH"@"$IP":"$DST_PATH" >> $SYNC_LOG
 }
 
-. ./config/user.cfg
+. /usr/local/etc/synchro-seedbox-ng/synchro.conf
 
 case "$1" in
 	start)
 
 		if test -f $LOCK_FILE
 		then
-			echo -e "Synchro for $2 already running"
+			echo -e "Sync of $2 folder is already running"
 			exit 3
 		else
-			if [ ! -d "$SYNC_SPOOL_SOURCE_PATH" ]; then
-				mkdir $SYNC_SPOOL_SOURCE_PATH
+			if [ ! -d "$SYNC_SPOOL_SRC_PATH" ]; then
+				mkdir $SYNC_SPOOL_SRC_PATH
 			fi
 			touch $LOCK_FILE
 		fi
@@ -111,6 +112,7 @@ case "$1" in
 
 		while test -f $SYNC_FILELIST
 		do
+			cd $SRC_PATH
 			send_files
 		done
 
