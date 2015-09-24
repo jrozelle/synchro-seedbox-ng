@@ -42,7 +42,7 @@ echo -e "${CBLUE}              Gros merci à ex_rat et à la communauté mondedi
 echo ""
 
 
-echo -e "${CGREEN}Enter SSDG NAS Username:$CEND"
+echo -e "${CGREEN}Enter SSNG NAS Username:$CEND"
 read NASUSER
 echo ""
 

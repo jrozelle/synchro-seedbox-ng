@@ -86,8 +86,8 @@ IFS=$old_IFS
 
 function send_file_job
 {
-	echo "sending $SRC_PATH/$1"
-	echo "$SRC_PATH/$1" > $SYNC_LOG
+	echo "sending $1"
+	echo "$1" > $SYNC_LOG
 	
         rsync -aPRL --partial-dir='.tmp' --temp-dir='.tmp' --rsh=ssh --remove-sent-files --bwlimit=$bwlimit "$1" "$user_SSH"@"$IP":"$DST_PATH" >> $SYNC_LOG
 }

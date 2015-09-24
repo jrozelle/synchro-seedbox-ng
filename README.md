@@ -7,7 +7,7 @@ cd /tmp
 
 git clone https://github.com/ag0r4n/synchro-seedbox-ng
 
-cd synchro-seedbox
+cd synchro-seedbox-ng
 
 chmod +x makeinstall.sh
 
@@ -24,4 +24,4 @@ Usage :
 
 Execute SSNG command
 
-# ssng /my/seedbox/folder /my/nas/folder 
+ssng /my/seedbox/folder /my/nas/folder 
