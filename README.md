@@ -5,7 +5,7 @@ Installation :
 ===============
 cd /tmp
 
-git clone https://github.com/ag0r4n/synchro-seedbox-ng
+git clone https://github.com/jrozelle/synchro-seedbox-ng.git
 
 cd synchro-seedbox-ng
 
